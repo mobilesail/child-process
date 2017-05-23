@@ -39,7 +39,7 @@ class Process extends EventEmitter
     
     private $terminated = false;
     private $loop;
-    
+    private $childs = array();
     /**
     * Constructor.
     *
@@ -106,7 +106,7 @@ class Process extends EventEmitter
         
         $this->status = proc_get_status($this->process);
         $this->_writeLog("pid: pstree -p {$this->status['pid']}");
-
+        
         $closeCount = 0;
 
         $that = $this;
@@ -141,29 +141,6 @@ class Process extends EventEmitter
         $loop->addEnterIdle($this->stdout, array($this, 'onEnterIdle'));
         $loop->addSignalInterrupted($this->stdout, array($this, 'onSignalInterrupted'));
         $loop->addOnWake($this->stdout, array($this, 'onWake'));
-        
-        pcntl_signal(SIGCHLD, function ($signinfo) use ($that) {
-            $this->_writeLog("onSIGCHLD");
-            
-            $init_wait_mtime = (microtime(true) * 1000000);
-        
-            $pid = pcntl_waitpid(-1, $status);
-        
-            $end_wait_mtime = (microtime(true)  * 1000000);
-        
-            $diff_wait_mtime = ($end_wait_mtime - $init_wait_mtime);
-            $diff_wait_mstime = ($end_wait_mtime - $init_wait_mtime) / 1000;
-            $this->_writeLog("SOSig: $end_wait_mtime - $init_wait_mtime = $diff_wait_mtime = $diff_wait_mstime ms");
-            $this->_writeLog("SOSig: ($diff_wait_mtime >= $timeout)".($diff_wait_mtime >= $timeout)." ".(($diff_wait_mtime - $timeout) / 1000));
-            
-            $isRunning = posix_kill($pid, 0);
-            $this->_writeLog("pid status :: {$pid} :: isRunning: $isRunning");
-            
-            if (!$isRunning) {
-                //$that->close();
-            }
-            $this->_writeLog("onSIGCHLD out");
-        }); 
         
         $this->loop = $loop;
         
