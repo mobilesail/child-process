@@ -104,7 +104,8 @@ class Process extends EventEmitter
             throw new \RuntimeException('Unable to launch a new process.');
         }
         
-        print_r(proc_get_status($this->process));
+        $this->status = proc_get_status($this->process);
+        $this->writeLog("pid: pstree -p $this->status['pid']");
 
         $closeCount = 0;
 
