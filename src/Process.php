@@ -105,7 +105,7 @@ class Process extends EventEmitter
         }
         
         $this->status = proc_get_status($this->process);
-        $this->writeLog("pid: pstree -p $this->status['pid']");
+        $this->_writeLog("pid: pstree -p $this->status['pid']");
 
         $closeCount = 0;
 
