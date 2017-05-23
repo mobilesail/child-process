@@ -108,18 +108,24 @@ class Process extends EventEmitter
 
         $that = $this;
         $streamCloseHandler = function () use (&$closeCount, $loop, $interval, $that) {
+            $this->_writeLog("onstreamCloseHandler");
+            
             $closeCount++;
             
             if ($closeCount < 2) {
                 return;
             }
-
-            $loop->addPeriodicTimer($interval, function (TimerInterface $timer) use ($that, $loop) {
-                if (!$that->isRunning()) {
-                    $that->close();
-                    $loop->cancelTimer($timer);
-                }
-            });
+            
+            if ($that->isRunning()) {
+                $loop->addPeriodicTimer($interval, function (TimerInterface $timer) use ($that, $loop) {
+                    if (!$that->isRunning()) {
+                        $that->close();
+                        $loop->cancelTimer($timer);
+                    }
+                });
+            }   
+            
+            $this->_writeLog("onstreamCloseHandler out");
         };
 
         $this->stdin  = new Stream($this->pipes[0], $loop);
