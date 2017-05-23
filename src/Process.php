@@ -146,8 +146,9 @@ class Process extends EventEmitter
             $this->_writeLog("onSIGCHLD");
             
             $isRunning = posix_kill($this->status['pid'], 0);
+            $this->status = proc_get_status($this->process);
             
-            $this->_writeLog("pid status :: {$this->status['pid']} :: isRunning: $isRunning ");
+            $this->_writeLog("pid status :: {$this->status['pid']} :: isRunning: $isRunning, {$this->status['running']}");
             
             if (!$isRunning) {
                 $that->close();
@@ -371,10 +372,16 @@ class Process extends EventEmitter
      */
     public function isRunning()
     {
+        
         if ($this->process === null) {
             return false;
         }
 
+        $isRunning = posix_kill($this->status['pid'], 0);
+        $this->status = proc_get_status($this->process);
+            
+        $this->_writeLog("pid status :: {$this->status['pid']} :: isRunning: $isRunning, {$this->status['running']}");
+            
         $status = $this->getFreshStatus();
 
         return $status !== null ? $status['running'] : false;
