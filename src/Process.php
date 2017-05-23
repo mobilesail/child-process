@@ -144,7 +144,12 @@ class Process extends EventEmitter
         
         pcntl_signal(SIGCHLD, function ($signinfo) use ($that) {
             $this->_writeLog("onSIGCHLD");
-            if (!$that->isRunning()) {
+            
+            $isRunning = posix_kill($this->status['pid'], 0);
+            
+            $this->_writeLog("pid status :: {$this->status['pid']} :: isRunning: $isRunning ");
+            
+            if (!$isRunning) {
                 $that->close();
             }
             $this->_writeLog("onSIGCHLD out");
