@@ -103,6 +103,8 @@ class Process extends EventEmitter
         if (!is_resource($this->process)) {
             throw new \RuntimeException('Unable to launch a new process.');
         }
+        
+        print_r(proc_get_status($this->process));
 
         $closeCount = 0;
 
