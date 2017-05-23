@@ -145,13 +145,22 @@ class Process extends EventEmitter
         pcntl_signal(SIGCHLD, function ($signinfo) use ($that) {
             $this->_writeLog("onSIGCHLD");
             
-            $isRunning = posix_kill($this->status['pid'], 0);
-            $this->status = proc_get_status($this->process);
+            $init_wait_mtime = (microtime(true) * 1000000);
+        
+            $pid = pcntl_waitpid(-1, $status);
+        
+            $end_wait_mtime = (microtime(true)  * 1000000);
+        
+            $diff_wait_mtime = ($end_wait_mtime - $init_wait_mtime);
+            $diff_wait_mstime = ($end_wait_mtime - $init_wait_mtime) / 1000;
+            $this->_writeLog("SOSig: $end_wait_mtime - $init_wait_mtime = $diff_wait_mtime = $diff_wait_mstime ms");
+            $this->_writeLog("SOSig: ($diff_wait_mtime >= $timeout)".($diff_wait_mtime >= $timeout)." ".(($diff_wait_mtime - $timeout) / 1000));
             
-            $this->_writeLog("pid status :: {$this->status['pid']} :: isRunning: $isRunning, {$this->status['running']}");
+            $isRunning = posix_kill($pid, 0);
+            $this->_writeLog("pid status :: {$pid} :: isRunning: $isRunning");
             
             if (!$isRunning) {
-                $that->close();
+                //$that->close();
             }
             $this->_writeLog("onSIGCHLD out");
         }); 
