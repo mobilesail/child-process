@@ -521,7 +521,7 @@ class Process extends EventEmitter
     }
     
     function _writeLog($info_){
-        echo date("[H:i:s]: ")."{$info_}\n";
+        //echo date("[H:i:s]: ")."{$info_}\n";
         /*
         if(defined('_SYSTEMDAEMON')){
             System_Daemon::log(System_Daemon::LOG_INFO, $info_);
