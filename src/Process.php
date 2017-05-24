@@ -105,13 +105,11 @@ class Process extends EventEmitter
         }
         
         $this->status = proc_get_status($this->process);
-        $this->_writeLog("pid: pstree -p {$this->status['pid']}");
         
         $closeCount = 0;
 
         $that = $this;
         $streamCloseHandler = function () use (&$closeCount, $loop, $interval, $that) {
-            $this->_writeLog("onstreamCloseHandler");
             
             $closeCount++;
             
@@ -127,8 +125,6 @@ class Process extends EventEmitter
                     }
                 });
             }   
-            
-            $this->_writeLog("onstreamCloseHandler out");
         };
 
         $this->stdin  = new Stream($this->pipes[0], $loop);
@@ -154,17 +150,9 @@ class Process extends EventEmitter
 
     public function onEnterIdle(){
         
-        $this->_writeLog("onEnterIdle");
-        
         if(!$this->terminated && !$this->isRunning()){
             $this->close();
         }
-        
-        $this->_writeLog(print_r($this->process), true);
-        $this->_writeLog(print_r($this->isRunning()), true);
-        $this->_writeLog(print_r($this->status), true);
-        $this->_writeLog("onEnterIdle out");
-        
     }
     
     public function onExitSignal($exitCode_){
@@ -187,12 +175,6 @@ class Process extends EventEmitter
     }
     
     public function onWake(){
-        $this->_writeLog("onWake");
-        
-        $this->_writeLog(print_r($this->process), true);
-        $this->_writeLog(print_r($this->isRunning()), true);
-        $this->_writeLog(print_r($this->status), true);
-        $this->_writeLog("onWake out");
         
     }
     
@@ -371,8 +353,6 @@ class Process extends EventEmitter
         $isRunning = posix_kill($this->status['pid'], 0);
         $this->status = proc_get_status($this->process);
             
-        $this->_writeLog("pid status :: {$this->status['pid']} :: isRunning: $isRunning, {$this->status['running']}");
-            
         $status = $this->getFreshStatus();
 
         return $status !== null ? $status['running'] : false;
@@ -521,7 +501,7 @@ class Process extends EventEmitter
     }
     
     function _writeLog($info_){
-        //echo date("[H:i:s]: ")."{$info_}\n";
+        echo date("[H:i:s]: ")."{$info_}\n";
         /*
         if(defined('_SYSTEMDAEMON')){
             System_Daemon::log(System_Daemon::LOG_INFO, $info_);
