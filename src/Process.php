@@ -167,6 +167,11 @@ class Process extends EventEmitter
         
     }
     
+    public function onExitSignal($exitCode_){
+        $this->exitCode = $exitCode_;
+        $this->close();
+    }
+    
     public function onSignalInterrupted(){
         $this->_writeLog("onSignalInterrupted");
         
