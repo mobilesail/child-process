@@ -117,6 +117,9 @@ class Process extends EventEmitter
                 return;
             }
             
+            $pid = pcntl_waitpid($that->status['pid'], $status);
+            $exitCode = pcntl_wexitstatus($status) ;
+        
             $isRunning = posix_kill($that->status['pid'], 0);
             $this->_writeLog("[streamCloseHandler] :: pid status :: {$that->status['pid']} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
             
