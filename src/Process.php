@@ -361,13 +361,12 @@ class Process extends EventEmitter
         if ($this->process === null) {
             return false;
         }
-
-        $isRunning = posix_kill($this->status['pid'], 0);
-        $this->status = proc_get_status($this->process);
-            
+        
         $status = $this->getFreshStatus();
-
-        return $status !== null ? $status['running'] : false;
+        
+        $isRunning = posix_kill($this->status['pid'], 0);
+        
+        return $isRunning;
     }
 
     /**
