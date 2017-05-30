@@ -117,16 +117,18 @@ class Process extends EventEmitter
                 return;
             }
             
-            
-            $pid = pcntl_waitpid($this->status['pid'], $status);
-            $exitCode = pcntl_wexitstatus($status) ;
-        
-            $isRunning = posix_kill($pid, 0);
-            $this->_writeLog("pid status :: {$pid} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
+            $isRunning = posix_kill($that->status['pid'], 0);
+            $this->_writeLog("[streamCloseHandler] :: pid status :: {$pid} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
             
             if ($isRunning) {
                 $loop->addPeriodicTimer($interval, function (TimerInterface $timer) use ($that, $loop) {
-                    if (!$that->isRunning()) {
+                    
+                    $isRunning = posix_kill($that->status['pid'], 0);
+            
+                    if (!$isRunning) {
+                        
+                        $this->_writeLog("[streamCloseHandler Timer] pid status :: {$pid} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
+                        
                         $that->close();
                         $loop->cancelTimer($timer);
                     }
