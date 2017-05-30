@@ -118,7 +118,7 @@ class Process extends EventEmitter
             }
             
             $isRunning = posix_kill($that->status['pid'], 0);
-            $this->_writeLog("[streamCloseHandler] :: pid status :: {$pid} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
+            $this->_writeLog("[streamCloseHandler] :: pid status :: {$that->status['pid']} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
             
             if ($isRunning) {
                 $loop->addPeriodicTimer($interval, function (TimerInterface $timer) use ($that, $loop) {
@@ -127,7 +127,7 @@ class Process extends EventEmitter
             
                     if (!$isRunning) {
                         
-                        $this->_writeLog("[streamCloseHandler Timer] pid status :: {$pid} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
+                        $this->_writeLog("[streamCloseHandler Timer] pid status :: {$that->status['pid']} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
                         
                         $that->close();
                         $loop->cancelTimer($timer);
@@ -158,6 +158,9 @@ class Process extends EventEmitter
     }
 
     public function onEnterIdle(){
+        
+        $this->_writeLog("[onEnterIdle()] pid status :: {$that->status['pid']} :: isRunning: $isRunning :: exitCode: $exitCode " . ' ' . posix_getpid() . ' ' . posix_getppid() );
+                        
         
         if(!$this->terminated && !$this->isRunning()){
             $this->close();
